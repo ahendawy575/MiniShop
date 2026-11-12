@@ -78,7 +78,7 @@
                             @foreach ($categoryProducts as $product)
                                 <article class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70">
                                     <div class="aspect-[4/3] overflow-hidden bg-slate-100">
-                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
+                                        <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
                                     </div>
                                     <div class="p-5">
                                         <p class="text-xs font-bold uppercase tracking-wider text-indigo-600">{{ $product->category->name }}</p>
