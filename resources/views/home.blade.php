@@ -13,8 +13,9 @@
             <a href="/" class="text-2xl font-black tracking-tight text-indigo-700">MiniShop<span class="text-blue-500">.</span></a>
 
             <div class="hidden items-center gap-7 md:flex">
+                <a href="{{ route('home') }}" class="text-sm font-medium {{ $selectedCategoryId === null ? 'text-indigo-700 font-bold' : 'text-slate-600' }} transition hover:text-indigo-700">All Products</a>
                 @foreach ($categories as $category)
-                    <a href="#category-{{ $category->slug }}" class="text-sm font-medium text-slate-600 transition hover:text-indigo-700">
+                    <a href="{{ route('home', ['category' => $category->id]) }}" class="text-sm {{ $selectedCategoryId == $category->id ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }} transition hover:text-indigo-700">
                         {{ $category->name }}
                     </a>
                 @endforeach
@@ -29,8 +30,9 @@
             </a>
         </nav>
         <div class="flex gap-5 overflow-x-auto px-5 pb-3 md:hidden">
+            <a href="{{ route('home') }}" class="shrink-0 text-sm {{ $selectedCategoryId === null ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }}">All Products</a>
             @foreach ($categories as $category)
-                <a href="#category-{{ $category->slug }}" class="shrink-0 text-sm font-medium text-slate-600">{{ $category->name }}</a>
+                <a href="{{ route('home', ['category' => $category->id]) }}" class="shrink-0 text-sm {{ $selectedCategoryId == $category->id ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }}">{{ $category->name }}</a>
             @endforeach
         </div>
     </header>
@@ -69,37 +71,39 @@
                 <span class="hidden text-sm text-slate-500 sm:block">{{ $products->count() }} items to explore</span>
             </div>
 
-            @forelse ($categories as $category)
-                @php($categoryProducts = $products->where('category_id', $category->id))
-                @if ($categoryProducts->isNotEmpty())
-                    <section id="category-{{ $category->slug }}" class="mb-14 scroll-mt-32 last:mb-0">
-                        <h3 class="mb-5 text-xl font-bold">{{ $category->name }}</h3>
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            @foreach ($categoryProducts as $product)
-                                <article class="group relative isolate overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70">
-                                    <a href="{{ route('products.show', $product->slug) }}" aria-label="View {{ $product->name }}" class="absolute inset-0 z-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"></a>
-                                    <div class="pointer-events-none relative z-0 aspect-[4/3] overflow-hidden bg-slate-100">
-                                        <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
-                                    </div>
-                                    <div class="pointer-events-none relative z-20 p-5">
-                                        <p class="text-xs font-bold uppercase tracking-wider text-indigo-600">{{ $product->category->name }}</p>
-                                        <h4 class="mt-2 text-lg font-bold">{{ $product->name }}</h4>
-                                        <div class="mt-5 flex items-center justify-between gap-3">
-                                            <span class="text-xl font-black text-slate-900">${{ number_format((float) $product->price, 2) }}</span>
-                                            <form action="{{ route('cart.add', $product) }}" method="POST" data-add-to-cart class="pointer-events-auto relative z-20">
-                                                @csrf
-                                                <button type="submit" class="rounded-full bg-indigo-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to Cart</button>
-                                            </form>
+            @if ($products->isEmpty())
+                <p class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-500">{{ $selectedCategoryId !== null ? 'No products in this category' : 'No products to show yet.' }}</p>
+            @else
+                @foreach ($categories as $category)
+                    @php($categoryProducts = $products->where('category_id', $category->id))
+                    @if ($categoryProducts->isNotEmpty())
+                        <section id="category-{{ $category->slug }}" class="mb-14 scroll-mt-32 last:mb-0">
+                            <h3 class="mb-5 text-xl font-bold">{{ $category->name }}</h3>
+                            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                @foreach ($categoryProducts as $product)
+                                    <article class="group relative isolate overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70">
+                                        <a href="{{ route('products.show', $product->slug) }}" aria-label="View {{ $product->name }}" class="absolute inset-0 z-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"></a>
+                                        <div class="pointer-events-none relative z-0 aspect-[4/3] overflow-hidden bg-slate-100">
+                                            <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
                                         </div>
-                                    </div>
-                                </article>
-                            @endforeach
-                        </div>
-                    </section>
-                @endif
-            @empty
-                <p class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-500">No products to show yet.</p>
-            @endforelse
+                                        <div class="pointer-events-none relative z-20 p-5">
+                                            <p class="text-xs font-bold uppercase tracking-wider text-indigo-600">{{ $product->category->name }}</p>
+                                            <h4 class="mt-2 text-lg font-bold">{{ $product->name }}</h4>
+                                            <div class="mt-5 flex items-center justify-between gap-3">
+                                                <span class="text-xl font-black text-slate-900">${{ number_format((float) $product->price, 2) }}</span>
+                                                <form action="{{ route('cart.add', $product) }}" method="POST" data-add-to-cart class="pointer-events-auto relative z-20">
+                                                    @csrf
+                                                    <button type="submit" class="rounded-full bg-indigo-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to Cart</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </article>
+                                @endforeach
+                            </div>
+                        </section>
+                    @endif
+                @endforeach
+            @endif
         </div>
     </main>
 
