@@ -13,13 +13,21 @@
             <a href="/" class="text-2xl font-black tracking-tight text-indigo-700">MiniShop<span class="text-blue-500">.</span></a>
 
             <div class="hidden items-center gap-7 md:flex">
-                <a href="{{ route('home') }}" class="text-sm font-medium {{ $selectedCategoryId === null ? 'text-indigo-700 font-bold' : 'text-slate-600' }} transition hover:text-indigo-700">All Products</a>
+                <a href="{{ route('home', request()->only('search')) }}" class="text-sm font-medium {{ $selectedCategoryId === null ? 'text-indigo-700 font-bold' : 'text-slate-600' }} transition hover:text-indigo-700">All Products</a>
                 @foreach ($categories as $category)
-                    <a href="{{ route('home', ['category' => $category->id]) }}" class="text-sm {{ $selectedCategoryId == $category->id ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }} transition hover:text-indigo-700">
+                    <a href="{{ route('home', ['category' => $category->id, 'search' => $search]) }}" class="text-sm {{ $selectedCategoryId == $category->id ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }} transition hover:text-indigo-700">
                         {{ $category->name }}
                     </a>
                 @endforeach
             </div>
+
+            <form action="{{ route('home') }}" method="GET" role="search" class="flex min-w-0 flex-1 items-center gap-2 md:max-w-sm">
+                @if ($selectedCategoryId !== null)
+                    <input type="hidden" name="category" value="{{ $selectedCategoryId }}">
+                @endif
+                <input type="search" name="search" value="{{ $search }}" placeholder="Search products..." aria-label="Search products" class="min-w-0 flex-1 rounded-full border border-slate-300 px-4 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+                <button type="submit" class="shrink-0 rounded-full bg-indigo-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-indigo-800">Search</button>
+            </form>
 
             <a href="{{ route('cart.index') }}" aria-label="Shopping cart" class="relative inline-flex size-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700">
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -30,11 +38,18 @@
             </a>
         </nav>
         <div class="flex gap-5 overflow-x-auto px-5 pb-3 md:hidden">
-            <a href="{{ route('home') }}" class="shrink-0 text-sm {{ $selectedCategoryId === null ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }}">All Products</a>
+            <a href="{{ route('home', request()->only('search')) }}" class="shrink-0 text-sm {{ $selectedCategoryId === null ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }}">All Products</a>
             @foreach ($categories as $category)
-                <a href="{{ route('home', ['category' => $category->id]) }}" class="shrink-0 text-sm {{ $selectedCategoryId == $category->id ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }}">{{ $category->name }}</a>
+                <a href="{{ route('home', ['category' => $category->id, 'search' => $search]) }}" class="shrink-0 text-sm {{ $selectedCategoryId == $category->id ? 'font-bold text-indigo-700' : 'font-medium text-slate-600' }}">{{ $category->name }}</a>
             @endforeach
         </div>
+        @if ($search !== null && $search !== '')
+            <div class="mx-auto max-w-7xl px-5 pb-4 lg:px-8">
+                <p class="text-sm text-slate-600">Showing results for: <span class="font-bold text-slate-900">{{ $search }}</span>
+                    <a href="{{ route('home', request()->only('category')) }}" class="ml-2 font-bold text-indigo-700 underline hover:text-indigo-900">Clear</a>
+                </p>
+            </div>
+        @endif
     </header>
 
     <main>
@@ -72,7 +87,11 @@
             </div>
 
             @if ($products->isEmpty())
-                <p class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-500">{{ $selectedCategoryId !== null ? 'No products in this category' : 'No products to show yet.' }}</p>
+                @if ($search !== null && $search !== '')
+                    <p class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-500">No products found for '{{ $search }}'</p>
+                @else
+                    <p class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-500">{{ $selectedCategoryId !== null ? 'No products in this category' : 'No products to show yet.' }}</p>
+                @endif
             @else
                 @foreach ($categories as $category)
                     @php($categoryProducts = $products->where('category_id', $category->id))

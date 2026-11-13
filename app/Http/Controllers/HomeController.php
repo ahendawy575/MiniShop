@@ -12,16 +12,21 @@ class HomeController extends Controller
     public function index(Request $request): View
     {
         $selectedCategoryId = $request->query('category');
+        $search = $request->query('search');
         $productQuery = Product::with('category')->latest();
 
         if ($selectedCategoryId !== null) {
             $productQuery->where('category_id', $selectedCategoryId);
         }
 
+        if ($search !== null && $search !== '') {
+            $productQuery->where('name', 'LIKE', '%'.$search.'%');
+        }
+
         $products = $productQuery->get();
         $categories = Category::all();
         $cartCount = array_sum(session('cart', []));
 
-        return view('home', compact('products', 'categories', 'cartCount', 'selectedCategoryId'));
+        return view('home', compact('products', 'categories', 'cartCount', 'selectedCategoryId', 'search'));
     }
 }
