@@ -76,16 +76,17 @@
                         <h3 class="mb-5 text-xl font-bold">{{ $category->name }}</h3>
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach ($categoryProducts as $product)
-                                <article class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70">
-                                    <div class="aspect-[4/3] overflow-hidden bg-slate-100">
+                                <article class="group relative isolate overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70">
+                                    <a href="{{ route('products.show', $product->slug) }}" aria-label="View {{ $product->name }}" class="absolute inset-0 z-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"></a>
+                                    <div class="pointer-events-none relative z-0 aspect-[4/3] overflow-hidden bg-slate-100">
                                         <img src="{{ Str::startsWith($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
                                     </div>
-                                    <div class="p-5">
+                                    <div class="pointer-events-none relative z-20 p-5">
                                         <p class="text-xs font-bold uppercase tracking-wider text-indigo-600">{{ $product->category->name }}</p>
                                         <h4 class="mt-2 text-lg font-bold">{{ $product->name }}</h4>
                                         <div class="mt-5 flex items-center justify-between gap-3">
                                             <span class="text-xl font-black text-slate-900">${{ number_format((float) $product->price, 2) }}</span>
-                                            <form action="{{ route('cart.add', $product) }}" method="POST" data-add-to-cart>
+                                            <form action="{{ route('cart.add', $product) }}" method="POST" data-add-to-cart class="pointer-events-auto relative z-20">
                                                 @csrf
                                                 <button type="submit" class="rounded-full bg-indigo-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to Cart</button>
                                             </form>
@@ -121,6 +122,7 @@
         }
 
         document.querySelectorAll('[data-add-to-cart]').forEach((form) => {
+            form.addEventListener('click', (event) => event.stopPropagation());
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 const button = form.querySelector('button[type="submit"]');

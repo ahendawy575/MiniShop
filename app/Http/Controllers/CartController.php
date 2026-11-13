@@ -109,7 +109,13 @@ class CartController extends Controller
     public function add(Request $request, Product $product): RedirectResponse
     {
         $cart = $request->session()->get('cart', []);
-        $cart[$product->id] = ($cart[$product->id] ?? 0) + 1;
+        $availableStock = max(0, $product->stock - (int) ($cart[$product->id] ?? 0));
+        $request->merge(['quantity' => $request->input('quantity', 1)]);
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:1', 'max:'.$availableStock],
+        ]);
+
+        $cart[$product->id] = (int) ($cart[$product->id] ?? 0) + (int) $validated['quantity'];
         $request->session()->put('cart', $cart);
 
         return back();
