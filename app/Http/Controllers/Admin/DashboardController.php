@@ -13,6 +13,7 @@ class DashboardController extends Controller
         return view('admin.dashboard', [
             'productCount' => Product::count(),
             'orderCount' => Order::count(),
+            'pendingOrderCount' => Order::where('status', 'pending')->count(),
             'salesTotal' => Order::sum('total'),
         ]);
     }

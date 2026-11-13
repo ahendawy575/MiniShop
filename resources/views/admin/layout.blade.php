@@ -17,6 +17,12 @@
                 <a href="{{ route('admin.dashboard') }}" class="block shrink-0 rounded-md px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-400 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">Dashboard</a>
                 <a href="{{ route('admin.products.index') }}" class="block shrink-0 rounded-md px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.products.*') ? 'bg-emerald-400 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">Products</a>
                 <a href="{{ route('admin.categories.index') }}" class="block shrink-0 rounded-md px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.categories.*') ? 'bg-emerald-400 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">Categories</a>
+                <a href="{{ route('admin.orders.index') }}" class="flex shrink-0 items-center gap-3 rounded-md px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.orders.*') ? 'bg-emerald-400 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18l-1.5 13h-15L3 7.5Zm4.5 0a4.5 4.5 0 0 1 9 0M9 11v2m6-2v2" />
+                    </svg>
+                    <span>Orders</span>
+                </a>
             </nav>
         </aside>
 
